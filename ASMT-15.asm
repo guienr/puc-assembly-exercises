@@ -1,0 +1,113 @@
+TITLE DECIMAL
+
+.MODEL SMALL
+
+.STACK 100
+
+LER MACRO 
+    MOV AH, 01h
+    INT 21h
+ENDM
+
+PULA MACRO
+    MOV AH, 02h
+    MOV DL, 13
+    INT 21h
+    MOV DL, 10
+    INT 21h
+ENDM
+
+PRINTC MACRO V
+    MOV AH, 02h
+    MOV DL, V
+    INT 21h
+ENDM
+
+PRINTS MACRO VAR
+    MOV AH, 09h
+    LEA DX, VAR
+    INT 21h
+ENDM
+
+.DATA
+DIVIDENDO DB "DIVIDENDO: $"
+DIVISOR DB "DIVISOR: $"
+RESULTADO DB "RESULTADO: $"
+NUM DB 3 DUP(?)
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    CALL LEITURA
+
+    CALL CONTA
+
+    CALL ESCREVER
+
+    MOV AH, 4CH
+    INT 21h
+MAIN ENDP
+
+LEITURA PROC 
+    PRINTS DIVIDENDO
+    LER
+    AND AL, 0Fh
+    MOV BL, AL
+    PULA
+    PRINTS DIVISOR
+    LER
+    AND AL, 0Fh
+    MOV BH, AL
+    PULA
+
+    RET
+LEITURA ENDP
+
+CONTA PROC
+    XOR AH, AH
+    MOV AL, BL
+    MOV CL, 100
+    MUL CL
+    DIV BH
+    XOR AH, AH
+
+    MOV SI, 2
+    MOV CL, 3
+    MOV CH, 10
+
+    ALGARISMOS:
+    XOR AH, AH
+    XOR DX, DX
+    DIV CH
+    MOV NUM[SI], AH
+    DEC SI
+    DEC CL
+    JNZ ALGARISMOS
+
+    RET
+CONTA ENDP
+
+ESCREVER PROC
+    PRINTS RESULTADO
+    MOV AH, 02h
+    XOR SI, SI
+    MOV DL, NUM[SI]
+    OR DL, 30h
+    INT 21h
+    MOV DL, ","
+    INT 21h
+    INC SI
+    MOV DL, NUM[SI]
+    OR DL, 30h
+    INT 21h
+    INC SI
+    MOV DL, NUM[SI]
+    OR DL, 30h
+    INT 21h
+
+    RET
+ESCREVER ENDP
+
+END MAIN

@@ -1,0 +1,49 @@
+TITLE COMPARA QUANTIDADE IGUAIS
+
+.MODEL SMALL
+
+.STACK 100
+
+.DATA
+STR1 DB "ABACA$"
+STR2 DB "ADAEA$"
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+    MOV ES, AX
+
+    CLD
+
+    LEA SI, STR1
+    LEA DI, STR2
+
+    MOV CX, 5
+
+    XOR BX, BX
+
+    COMPARAR:
+
+    CMPSB
+    JE CONTADOR
+
+    LOOP COMPARAR
+
+    JMP FINAL
+
+    CONTADOR:
+    INC BX
+    DEC CX
+    JNZ COMPARAR
+
+    FINAL:
+    MOV AH, 02h
+    MOV DL, BL
+    OR DL, 30h
+    INT 21h
+
+    MOV AH, 4CH
+    INT 21h
+MAIN ENDP
+END MAIN

@@ -1,0 +1,96 @@
+TITLE LISTA REVISAO3 EX3
+
+.MODEL SMALL
+
+.STACK 100
+
+.DATA
+MESTRE DB "abcd"
+SENHA DB 4 DUP (?)
+MSG1 DB "SENHA INCORRETA$"
+MSG2 DB "FIM DAS TENTATIVAS, TENTATIVA DE ACESSO BLOQUADA$"
+MSG3 DB "SENHA CORRETA$"
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+    MOV ES, AX
+
+    CLD
+
+    MOV CX, 3
+
+    TENTATIVA:
+
+    CALL DIGITA
+
+    CALL COMPARA
+
+    LOOP TENTATIVA
+
+    MOV AH, 09h
+    LEA DX, MSG2
+    INT 21h
+
+    FINAL:
+
+MOV AH, 4CH
+INT 21h
+MAIN ENDP
+
+DIGITA PROC
+    PUSH CX
+
+    MOV CX, 4
+
+    LEA DI, SENHA
+
+    DIG:
+    MOV AH, 01h
+    INT 21h
+    STOSB
+    LOOP DIG
+
+    MOV AH, 02h
+    MOV DL, 13
+    INT 21h
+    MOV DL, 10
+    INT 21h
+
+    POP CX
+    RET
+DIGITA ENDP
+
+COMPARA PROC
+    PUSH CX
+
+    XOR BX, BX
+
+    LEA SI, MESTRE
+    LEA DI, SENHA
+
+    REP CMPSB
+    JNE ERRO
+    
+    MOV AH, 09h
+    LEA DX, MSG3
+    INT 21h
+    JMP FINAL
+
+    ERRO:
+    MOV AH, 09h
+    LEA DX, MSG1
+    INT 21h
+
+    MOV AH, 02h
+    MOV DL, 13
+    INT 21h
+    MOV DL, 10
+    INT 21h
+
+    POP CX 
+    RET
+COMPARA ENDP
+
+END MAIN
